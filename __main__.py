@@ -49,7 +49,7 @@ def find_needed_bytes(rom, needed_bytes, start_at):
 
         # sanity check
         rom.seek(start)
-        assert rom.read(needed_bytes) == b"\xff\xff\xff\xff" * needed_words
+        assert rom.read(round_up_to_4(needed_bytes)) == b"\xff\xff\xff\xff" * needed_words
 
     return start
 
