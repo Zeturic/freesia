@@ -1,4 +1,5 @@
-import argparse, sys, os.path
+import argparse, sys
+from pathlib import Path
 
 argparser = argparse.ArgumentParser(description="Locates free space inside a GBA ROM.")
 argparser.add_argument("--rom", dest="ROM", required=True)
@@ -39,7 +40,7 @@ def find_needed_bytes(rom, needed_bytes, start_at):
                 else:
                     record += 1
             elif len(val) < 4:
-                print(f"{os.path.basename(sys.argv[0])}: error: end of file reached before a suitable location was found", file=sys.stderr)
+                print(f"{Path(sys.argv[0]).name}: error: end of file reached before a suitable location was found", file=sys.stderr)
                 sys.exit(1)
             else:
                 record, start = 0, None
