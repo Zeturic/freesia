@@ -4,15 +4,6 @@ from __future__ import print_function
 
 import argparse, sys, os.path
 
-argparser = argparse.ArgumentParser(description="Locates free space inside a GBA ROM.")
-argparser.add_argument("--rom", dest="ROM", required=True)
-argparser.add_argument("--needed-bytes", dest="NEEDED_BYTES", required=True)
-argparser.add_argument("--start-at", dest="START_AT", required=True)
-
-args = argparser.parse_args()
-args.NEEDED_BYTES = int(args.NEEDED_BYTES, 0)
-args.START_AT = int(args.START_AT, 0) & 0x1FFFFFF
-
 def round_up_to_4(x):
     if x & 0x3 == 0:
         return x
@@ -25,7 +16,7 @@ def find_needed_bytes(rom, needed_bytes, start_at):
 
     needed_words = round_up_to_4(needed_bytes) >> 2
     start_at = round_up_to_4(start_at)
-    
+
     with open(rom, "rb") as rom:
         rom.seek(start_at)
 
@@ -38,7 +29,7 @@ def find_needed_bytes(rom, needed_bytes, start_at):
                 if start is None:
                     assert record == 0
                     record = 1
-                    
+
                     start = rom.tell() - 4
                 else:
                     record += 1
@@ -54,7 +45,19 @@ def find_needed_bytes(rom, needed_bytes, start_at):
 
     return start
 
+def main():
+    argparser = argparse.ArgumentParser(description="Locates free space inside a GBA ROM.")
+    argparser.add_argument("--rom", dest="ROM", required=True)
+    argparser.add_argument("--needed-bytes", dest="NEEDED_BYTES", required=True)
+    argparser.add_argument("--start-at", dest="START_AT", required=True)
 
-addr = find_needed_bytes(rom=args.ROM, needed_bytes=args.NEEDED_BYTES, start_at=args.START_AT) | 0x08000000
+    args = argparser.parse_args()
+    args.NEEDED_BYTES = int(args.NEEDED_BYTES, 0)
+    args.START_AT = int(args.START_AT, 0) & 0x1FFFFFF
 
-print("0x{0:08X}".format(addr))
+    addr = find_needed_bytes(rom=args.ROM, needed_bytes=args.NEEDED_BYTES, start_at=args.START_AT) | 0x08000000
+
+    print("0x{0:08X}".format(addr))
+
+if __name__ == "__main__":
+    main()
