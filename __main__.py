@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 
-import argparse, sys, os.path
+import argparse, sys
 
 def round_up_to_4(x):
     if x & 0x3 == 0:
@@ -34,8 +34,7 @@ def find_needed_bytes(rom, needed_bytes, start_at):
                 else:
                     record += 1
             elif len(val) < 4:
-                print("{}: error: end of file reached before a suitable location was found".format(os.path.basename(sys.argv[0])), file=sys.stderr)
-                sys.exit(1)
+                raise EOFError()
             else:
                 record, start = 0, None
 
@@ -55,9 +54,12 @@ def main():
     args.NEEDED_BYTES = int(args.NEEDED_BYTES, 0)
     args.START_AT = int(args.START_AT, 0) & 0x1FFFFFF
 
-    addr = find_needed_bytes(rom=args.ROM, needed_bytes=args.NEEDED_BYTES, start_at=args.START_AT) | 0x08000000
-
-    print("0x{0:08X}".format(addr))
+    try:
+        addr = find_needed_bytes(rom=args.ROM, needed_bytes=args.NEEDED_BYTES, start_at=args.START_AT) | 0x08000000
+        print("0x{0:08X}".format(addr))
+    except EOFError:
+        print("{}: error: end of file reached before a suitable location was found".format(argparser.prog), file=sys.stderr)
+        return 1
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
