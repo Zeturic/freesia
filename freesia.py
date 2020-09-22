@@ -10,37 +10,36 @@ def round_up_to_4(x):
     else:
         return round_up_to_4(x + 1)
 
-def find_needed_bytes(rom, needed_bytes, start_at):
+def find_needed_bytes(*, rom, needed_bytes, start_at):
     if needed_bytes == 0:
         return 0
 
     needed_words = round_up_to_4(needed_bytes) >> 2
     start_at = round_up_to_4(start_at)
 
-    with open(rom, "rb") as rom:
-        rom.seek(start_at)
+    rom.seek(start_at)
 
-        record, start = 0, None
+    record, start = 0, None
 
-        while record < needed_words:
-            val = rom.read(4)
+    while record < needed_words:
+        val = rom.read(4)
 
-            if val == b"\xff\xff\xff\xff":
-                if start is None:
-                    assert record == 0
-                    record = 1
+        if val == b"\xff\xff\xff\xff":
+            if start is None:
+                assert record == 0
+                record = 1
 
-                    start = rom.tell() - 4
-                else:
-                    record += 1
-            elif len(val) < 4:
-                raise EOFError()
+                start = rom.tell() - 4
             else:
-                record, start = 0, None
+                record += 1
+        elif len(val) < 4:
+            raise EOFError()
+        else:
+            record, start = 0, None
 
-        # sanity check
-        rom.seek(start)
-        assert rom.read(round_up_to_4(needed_bytes)) == b"\xff\xff\xff\xff" * needed_words
+    # sanity check
+    rom.seek(start)
+    assert rom.read(round_up_to_4(needed_bytes)) == b"\xff\xff\xff\xff" * needed_words
 
     return start
 
@@ -55,8 +54,9 @@ def main():
     args.START_AT = int(args.START_AT, 0) & 0x1FFFFFF
 
     try:
-        addr = find_needed_bytes(rom=args.ROM, needed_bytes=args.NEEDED_BYTES, start_at=args.START_AT) | 0x08000000
-        print("0x{0:08X}".format(addr))
+        with open(args.ROM, "rb") as rom:
+            addr = find_needed_bytes(rom=rom, needed_bytes=args.NEEDED_BYTES, start_at=args.START_AT) | 0x08000000
+            print("0x{0:08X}".format(addr))
     except EOFError:
         print("{}: error: end of file reached before a suitable location was found".format(argparser.prog), file=sys.stderr)
         return 1
