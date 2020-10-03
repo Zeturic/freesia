@@ -10,7 +10,7 @@ def round_up_to_4(x):
     else:
         return round_up_to_4(x + 1)
 
-def find_needed_bytes(*, rom, needed_bytes, start_at):
+def find_needed_bytes(rom, needed_bytes, start_at):
     if needed_bytes == 0:
         return 0
 
