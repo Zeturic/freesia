@@ -33,7 +33,7 @@ def find_needed_bytes(rom, needed_bytes, start_at):
             else:
                 record += 1
         elif len(val) < 4:
-            raise EOFError()
+            return -1
         else:
             record, start = 0, None
 
@@ -53,13 +53,14 @@ def main():
     args.NEEDED_BYTES = int(args.NEEDED_BYTES, 0)
     args.START_AT = int(args.START_AT, 0) & 0x1FFFFFF
 
-    try:
-        with open(args.ROM, "rb") as rom:
-            addr = find_needed_bytes(rom=rom, needed_bytes=args.NEEDED_BYTES, start_at=args.START_AT) | 0x08000000
-            print("0x{0:08X}".format(addr))
-    except EOFError:
-        print("{}: error: end of file reached before a suitable location was found".format(argparser.prog), file=sys.stderr)
-        return 1
+    with open(args.ROM, "rb") as rom:
+        addr = find_needed_bytes(rom=rom, needed_bytes=args.NEEDED_BYTES, start_at=args.START_AT)
+
+        if addr == -1:
+            print("{}: error: end of file reached before a suitable location was found".format(argparser.prog), file=sys.stderr)
+            return 1
+
+        print("0x{0:08X}".format(addr | 0x08000000))
 
 if __name__ == "__main__":
     sys.exit(main())
