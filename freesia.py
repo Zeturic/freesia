@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 
-import argparse, sys
+import argparse, sys, io
 
 def round_up_to_4(x):
     if x & 0x3 == 0:
@@ -17,6 +17,7 @@ def find_needed_bytes(rom, needed_bytes, start_at):
     needed_words = round_up_to_4(needed_bytes) >> 2
     start_at = round_up_to_4(start_at)
 
+    rom = io.BytesIO(rom)
     rom.seek(start_at)
 
     record, start = 0, None
@@ -53,7 +54,8 @@ def main():
     args.NEEDED_BYTES = int(args.NEEDED_BYTES, 0)
     args.START_AT = int(args.START_AT, 0) & 0x1FFFFFF
 
-    with open(args.ROM, "rb") as rom:
+    with open(args.ROM, "rb") as f:
+        rom = f.read()
         addr = find_needed_bytes(rom=rom, needed_bytes=args.NEEDED_BYTES, start_at=args.START_AT)
 
         if addr == -1:
