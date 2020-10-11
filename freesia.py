@@ -2,7 +2,11 @@
 
 from __future__ import print_function
 
-import argparse, sys, io
+import argparse, sys, io, functools
+
+# functools.wraps is used for the sake of argparse's error messages
+parse_int = functools.partial(int, base=0)
+parse_int = functools.wraps(int)(parse_int)
 
 def find_needed_bytes(rom, needed_bytes, start_at=0):
     # round needed_bytes up to next multiple of 4
@@ -20,12 +24,11 @@ def find_needed_bytes(rom, needed_bytes, start_at=0):
 def main():
     argparser = argparse.ArgumentParser(description="Locates free space inside a GBA ROM.")
     argparser.add_argument("--rom", dest="ROM", required=True)
-    argparser.add_argument("--needed-bytes", dest="NEEDED_BYTES", required=True)
-    argparser.add_argument("--start-at", dest="START_AT", default="0")
+    argparser.add_argument("--needed-bytes", dest="NEEDED_BYTES", required=True, type=parse_int)
+    argparser.add_argument("--start-at", dest="START_AT", default="0", type=parse_int)
 
     args = argparser.parse_args()
-    args.NEEDED_BYTES = int(args.NEEDED_BYTES, 0)
-    args.START_AT = int(args.START_AT, 0) & 0x1FFFFFF
+    args.START_AT &= 0x1FFFFFF
 
     with open(args.ROM, "rb") as f:
         rom = f.read()
