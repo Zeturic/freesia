@@ -4,14 +4,12 @@ from __future__ import print_function
 
 import argparse, sys, io
 
-def round_up_to_4(x):
-    if x & 0x3 == 0:
-        return x
-    else:
-        return round_up_to_4(x + 1)
-
 def find_needed_bytes(rom, needed_bytes, start_at):
-    needle = b"\xff" * round_up_to_4(needed_bytes)
+    # round needed_bytes up to next multiple of 4
+    # if it is already a multiple of 4, it is left as-is
+    rounded = (needed_bytes + 3) & ~3
+
+    needle = b"\xff" * rounded
     pos = rom.find(needle, start_at)
 
     while pos & 0b11 != 0 and pos != -1:
@@ -37,7 +35,7 @@ def main():
             print("{}: error: end of file reached before a suitable location was found".format(argparser.prog), file=sys.stderr)
             return 1
 
-        print("0x{0:08X}".format(addr | 0x08000000))
+        print("0x{:08X}".format(addr | 0x08000000))
 
 if __name__ == "__main__":
     sys.exit(main())
