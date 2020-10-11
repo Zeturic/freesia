@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import argparse, sys, io
 
-def find_needed_bytes(rom, needed_bytes, start_at):
+def find_needed_bytes(rom, needed_bytes, start_at=0):
     # round needed_bytes up to next multiple of 4
     # if it is already a multiple of 4, it is left as-is
     rounded = (needed_bytes + 3) & ~3
@@ -21,7 +21,7 @@ def main():
     argparser = argparse.ArgumentParser(description="Locates free space inside a GBA ROM.")
     argparser.add_argument("--rom", dest="ROM", required=True)
     argparser.add_argument("--needed-bytes", dest="NEEDED_BYTES", required=True)
-    argparser.add_argument("--start-at", dest="START_AT", required=True)
+    argparser.add_argument("--start-at", dest="START_AT", default="0")
 
     args = argparser.parse_args()
     args.NEEDED_BYTES = int(args.NEEDED_BYTES, 0)
