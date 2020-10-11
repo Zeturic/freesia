@@ -11,38 +11,13 @@ def round_up_to_4(x):
         return round_up_to_4(x + 1)
 
 def find_needed_bytes(rom, needed_bytes, start_at):
-    if needed_bytes == 0:
-        return 0
+    needle = b"\xff" * round_up_to_4(needed_bytes)
+    pos = rom.find(needle, start_at)
 
-    needed_words = round_up_to_4(needed_bytes) >> 2
-    start_at = round_up_to_4(start_at)
+    while pos & 0b11 != 0 and pos != -1:
+        pos = rom.find(needle, pos + 1)
 
-    rom = io.BytesIO(rom)
-    rom.seek(start_at)
-
-    record, start = 0, None
-
-    while record < needed_words:
-        val = rom.read(4)
-
-        if val == b"\xff\xff\xff\xff":
-            if start is None:
-                assert record == 0
-                record = 1
-
-                start = rom.tell() - 4
-            else:
-                record += 1
-        elif len(val) < 4:
-            return -1
-        else:
-            record, start = 0, None
-
-    # sanity check
-    rom.seek(start)
-    assert rom.read(round_up_to_4(needed_bytes)) == b"\xff\xff\xff\xff" * needed_words
-
-    return start
+    return pos
 
 def main():
     argparser = argparse.ArgumentParser(description="Locates free space inside a GBA ROM.")
