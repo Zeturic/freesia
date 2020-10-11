@@ -23,9 +23,9 @@ def find_needed_bytes(rom, needed_bytes, start_at=0):
 
 def main():
     argparser = argparse.ArgumentParser(description="Locates free space inside a GBA ROM.")
-    argparser.add_argument("--rom", required=True)
-    argparser.add_argument("--needed-bytes", required=True, type=parse_int)
-    argparser.add_argument("--start-at", default="0", type=parse_int)
+    argparser.add_argument("--rom", "-r", required=True)
+    argparser.add_argument("--needed-bytes", "-n", required=True, type=parse_int)
+    argparser.add_argument("--start-at", "-s", default="0", type=parse_int)
 
     args = argparser.parse_args()
     args.start_at &= 0x1FFFFFF
