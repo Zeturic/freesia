@@ -32,13 +32,14 @@ def main():
 
     with open(args.ROM, "rb") as f:
         rom = f.read()
-        addr = find_needed_bytes(rom=rom, needed_bytes=args.NEEDED_BYTES, start_at=args.START_AT)
 
-        if addr == -1:
-            print("{}: error: end of file reached before a suitable location was found".format(argparser.prog), file=sys.stderr)
-            return 1
+    addr = find_needed_bytes(rom=rom, needed_bytes=args.NEEDED_BYTES, start_at=args.START_AT)
 
-        print("0x{:08X}".format(addr | 0x08000000))
+    if addr == -1:
+        print("{}: error: end of file reached before a suitable location was found".format(argparser.prog), file=sys.stderr)
+        return 1
+
+    print("0x{:08X}".format(addr | 0x08000000))
 
 if __name__ == "__main__":
     sys.exit(main())
