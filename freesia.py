@@ -28,8 +28,12 @@ def main():
     args = argparser.parse_args()
     args.start_at &= 0x1FFFFFF
 
-    with open(args.rom, "rb") as f:
-        rom = f.read()
+    try:
+        with open(args.rom, "rb") as f:
+            rom = f.read()
+    except OSError:
+        print(f"{argparser.prog}: error: unable to open '{args.rom}' for reading", file=sys.stderr)
+        return 1
 
     addr = find_needed_bytes(rom=rom, needed_bytes=args.needed_bytes, start_at=args.start_at)
 
