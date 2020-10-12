@@ -1,14 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-from __future__ import print_function
-
-import argparse, sys, io, functools
+import argparse, sys, functools
 
 # functools.wraps is used for the sake of argparse's error messages
 parse_int = functools.partial(int, base=0)
 parse_int = functools.wraps(int)(parse_int)
 
-def find_needed_bytes(rom, needed_bytes, start_at=0):
+def find_needed_bytes(*, rom, needed_bytes, start_at=0):
     # round needed_bytes up to next multiple of 4
     # if it is already a multiple of 4, it is left as-is
     rounded = (needed_bytes + 3) & ~3
@@ -36,10 +34,10 @@ def main():
     addr = find_needed_bytes(rom=rom, needed_bytes=args.needed_bytes, start_at=args.start_at)
 
     if addr == -1:
-        print("{}: error: end of file reached before a suitable location was found".format(argparser.prog), file=sys.stderr)
+        print(f"{argparser.prog}: error: end of file reached before a suitable location was found", file=sys.stderr)
         return 1
 
-    print("0x{:08X}".format(addr | 0x08000000))
+    print(f"0x{addr | 0x08000000 :08X}")
 
 if __name__ == "__main__":
     sys.exit(main())
