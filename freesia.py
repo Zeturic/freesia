@@ -6,7 +6,7 @@ import argparse, sys, functools
 parse_int = functools.partial(int, base=0)
 parse_int = functools.wraps(int)(parse_int)
 
-def find_needed_bytes(*, rom, needed_bytes, start_at=0):
+def find_free_space(*, rom, needed_bytes, start_at=0):
     start_at &= 0x1FFFFFF
 
     # round needed_bytes up to next multiple of 4
@@ -36,7 +36,7 @@ def main():
         print(f"{argparser.prog}: error: unable to open '{args.rom}' for reading", file=sys.stderr)
         return 1
 
-    addr = find_needed_bytes(rom=rom, needed_bytes=args.needed_bytes, start_at=args.start_at)
+    addr = find_free_space(rom=rom, needed_bytes=args.needed_bytes, start_at=args.start_at)
 
     if addr == -1:
         print(f"{argparser.prog}: error: end of file reached before a suitable location was found", file=sys.stderr)
