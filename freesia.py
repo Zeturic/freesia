@@ -7,6 +7,8 @@ parse_int = functools.partial(int, base=0)
 parse_int = functools.wraps(int)(parse_int)
 
 def find_needed_bytes(*, rom, needed_bytes, start_at=0):
+    start_at &= 0x1FFFFFF
+
     # round needed_bytes up to next multiple of 4
     # if it is already a multiple of 4, it is left as-is
     rounded = (needed_bytes + 3) & ~3
@@ -17,7 +19,7 @@ def find_needed_bytes(*, rom, needed_bytes, start_at=0):
     while pos & 0b11 != 0 and pos != -1:
         pos = rom.find(needle, pos + 1)
 
-    return pos
+    return pos | 0x08000000
 
 def main():
     argparser = argparse.ArgumentParser(description="Locates free space inside a GBA ROM.")
@@ -26,7 +28,6 @@ def main():
     argparser.add_argument("--start-at", "-s", default="0", type=parse_int)
 
     args = argparser.parse_args()
-    args.start_at &= 0x1FFFFFF
 
     try:
         with open(args.rom, "rb") as f:
@@ -41,7 +42,7 @@ def main():
         print(f"{argparser.prog}: error: end of file reached before a suitable location was found", file=sys.stderr)
         return 1
 
-    print(f"0x{addr | 0x08000000 :08X}")
+    print(f"0x{addr :08X}")
 
 if __name__ == "__main__":
     sys.exit(main())
