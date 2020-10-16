@@ -2,9 +2,8 @@
 
 import argparse, sys, functools
 
-# functools.wraps is used for the sake of argparse's error messages
-parse_int = functools.partial(int, base=0)
-parse_int = functools.wraps(int)(parse_int)
+def number(string):
+    return int(string, base=0)
 
 def find_free_space(*, rom, needed_bytes, start_at=0):
     start_at &= 0x1FFFFFF
@@ -24,8 +23,8 @@ def find_free_space(*, rom, needed_bytes, start_at=0):
 def main():
     argparser = argparse.ArgumentParser(description="Locates free space inside a GBA ROM.")
     argparser.add_argument("--rom", "-r", required=True)
-    argparser.add_argument("--needed-bytes", "-n", required=True, type=parse_int)
-    argparser.add_argument("--start-at", "-s", default="0", type=parse_int)
+    argparser.add_argument("--needed-bytes", "-n", required=True, type=number)
+    argparser.add_argument("--start-at", "-s", default="0", type=number)
 
     args = argparser.parse_args()
 
