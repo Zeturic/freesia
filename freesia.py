@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
-import argparse, sys, functools
+import argparse
+import functools
+import sys
 
-def number(string):
-    return int(string, base=0)
+from pathlib import Path
+
+integer = functools.wraps(int)(functools.partial(int, base=0))
 
 def find_free_space(*, rom, needed_bytes, start_at=0):
     start_at &= 0x1FFFFFF
@@ -22,15 +25,14 @@ def find_free_space(*, rom, needed_bytes, start_at=0):
 
 def main():
     argparser = argparse.ArgumentParser(description="Locates free space inside a GBA ROM.")
-    argparser.add_argument("--rom", "-r", required=True)
-    argparser.add_argument("--needed-bytes", "-n", required=True, type=number)
-    argparser.add_argument("--start-at", "-s", default="0", type=number)
+    argparser.add_argument("--rom", "-r", required=True, type=Path)
+    argparser.add_argument("--needed-bytes", "-n", required=True, type=integer)
+    argparser.add_argument("--start-at", "-s", default="0", type=integer)
 
     args = argparser.parse_args()
 
     try:
-        with open(args.rom, "rb") as f:
-            rom = f.read()
+        rom = args.rom.read_bytes()
     except OSError:
         print(f"{argparser.prog}: error: unable to open '{args.rom}' for reading", file=sys.stderr)
         return 1
