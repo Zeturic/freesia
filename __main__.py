@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
+from __init__ import main
 
-import sys, freesia
-
-sys.exit(freesia.main())
+main()
