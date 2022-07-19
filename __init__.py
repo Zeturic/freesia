@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-import argparse
-import functools
-
+from argparse import ArgumentParser
+from functools import partial, wraps
 from pathlib import Path
 
-integer = functools.wraps(int)(functools.partial(int, base=0))
+integer = wraps(int)(partial(int, base=0))
 
 def find_free_space(*, rom, needed_bytes, start_at=0):
     start_at &= 0x1FFFFFF
@@ -23,7 +22,7 @@ def find_free_space(*, rom, needed_bytes, start_at=0):
     return pos | 0x08000000
 
 def main(args=None):
-    argparser = argparse.ArgumentParser(description="Locates free space inside a GBA ROM.")
+    argparser = ArgumentParser(description="Locates free space inside a GBA ROM.")
     argparser.add_argument("--rom", "-r", required=True, type=Path)
     argparser.add_argument("--needed-bytes", "-n", required=True, type=integer)
     argparser.add_argument("--start-at", "-s", default="0", type=integer)
